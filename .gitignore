@@ -1,3 +1,7 @@
+# env variables
+/src/common/envs/development.env
+docker.env
+
 # compiled output
 /dist
 /node_modules
