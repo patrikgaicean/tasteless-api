@@ -1,26 +1,57 @@
 import { Injectable } from '@nestjs/common';
+import { DiscsRepository } from './discs.repository';
 import { CreateDiscDto } from './dto/create-disc.dto';
-import { UpdateDiscDto } from './dto/update-disc.dto';
+import { DiscDto } from './dto/disc.dto';
+import { Disc } from './entities/disc.entity';
 
 @Injectable()
 export class DiscsService {
-  create(createDiscDto: CreateDiscDto) {
-    return 'This action adds a new disc';
+  constructor(
+    private discsRepository: DiscsRepository
+  ) {}
+
+  async create(discData: CreateDiscDto) {
+    const entity: Disc = await this.discsRepository.createDisc(this.toEntity(discData));
+
+    return this.toDto(entity);
   }
 
-  findAll() {
-    return `This action returns all discs`;
+  async findAll() {
+    const entities: Disc[] = await this.discsRepository.findAll();
+
+    return entities.map(e => this.toDto(e));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} disc`;
+  async findOne(id: number) {
+    const entity: Disc = await this.discsRepository.findById(id);
+
+    return this.toDto(entity);
   }
 
-  update(id: number, updateDiscDto: UpdateDiscDto) {
-    return `This action updates a #${id} disc`;
-  }
-
-  remove(id: number) {
+  async remove(id: number) {
     return `This action removes a #${id} disc`;
+  }
+
+  toEntity(dto: DiscDto): Disc {
+    return {
+      title: dto.title,
+      artist: dto.artist,
+      release_date: new Date(dto.releaseDate),
+      genre: dto.genre,
+      description: dto.description,
+      track_list: dto.trackList
+    }
+  }
+
+  toDto(entity: Disc): DiscDto {
+    return {
+      discId: entity.disc_id,
+      title: entity.title,
+      artist: entity.artist,
+      releaseDate: `${entity.release_date}`,
+      genre: entity.genre,
+      description: entity.description,
+      trackList: entity.track_list
+    }
   }
 }
