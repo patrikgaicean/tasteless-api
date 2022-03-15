@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { FilesService } from '../files/files.service';
 import { DiscsRepository } from './discs.repository';
 import { CreateDiscDto } from './dto/create-disc.dto';
 import { DiscDto } from './dto/disc.dto';
@@ -7,13 +8,18 @@ import { Disc } from './entities/disc.entity';
 @Injectable()
 export class DiscsService {
   constructor(
-    private discsRepository: DiscsRepository
+    private discsRepository: DiscsRepository,
+    private filesService: FilesService
   ) {}
 
   async create(discData: CreateDiscDto) {
     const entity: Disc = await this.discsRepository.createDisc(this.toEntity(discData));
 
     return this.toDto(entity);
+  }
+
+  async uploadImage(imageBuffer: Buffer, filename: string) {
+    return this.filesService.uploadImage(imageBuffer, filename);
   }
 
   async findAll() {

@@ -10,9 +10,9 @@ import { UsersRepository } from '../users/users.repository';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersRepository: UsersRepository,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private usersRepository: UsersRepository,
+    private jwtService: JwtService,
+    private configService: ConfigService
   ) {}
  
   public async register(userData: RegisterDto) {
@@ -29,6 +29,7 @@ export class AuthService {
 
       return createdUser;
     } catch (error) {
+      console.error(error)
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new HttpException('User with that email already exists', HttpStatus.BAD_REQUEST);
       }

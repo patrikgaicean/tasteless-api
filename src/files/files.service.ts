@@ -1,26 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
+import { ConfigService } from '@nestjs/config';
+import { S3 } from 'aws-sdk';
+import { v4 as uuid } from 'uuid';
+import { ImagesRepository } from './images.repository';
 
 @Injectable()
 export class FilesService {
-  create(createFileDto: CreateFileDto) {
-    return 'This action adds a new file';
-  }
+  constructor(
+    private imagesRepository: ImagesRepository,
+    private configService: ConfigService
+  ) {}
 
-  findAll() {
-    return `This action returns all files`;
-  }
+  async uploadImage(dataBuffer: Buffer, filename: string) {
+    const s3 = new S3();
 
-  findOne(id: number) {
-    return `This action returns a #${id} file`;
-  }
+    const uploadResult = await s3.upload({
+      Bucket: this.configService.get<string>('AWS_PRIVATE_BUCKET_NAME'),
+      Body: dataBuffer,
+      Key: `${uuid()}-${filename}`
+    })
+      .promise();
+ 
+    const newFile = await this.imagesRepository.createImage({
+      key: uploadResult.Key
+    });
 
-  update(id: number, updateFileDto: UpdateFileDto) {
-    return `This action updates a #${id} file`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} file`;
+    return newFile;
   }
 }
