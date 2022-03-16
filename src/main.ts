@@ -1,10 +1,11 @@
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { config as awsConfig } from 'aws-sdk';
 
 async function bootstrap() {
   const app: NestExpressApplication = await NestFactory.create(AppModule);
@@ -29,8 +30,14 @@ async function bootstrap() {
     customSiteTitle: 'Tasteless API Docs'
   }
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, document, swaggerOptions);
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api', app, swaggerDocument, swaggerOptions);
+
+  awsConfig.update({
+    accessKeyId: config.get<string>('AWS_ACCESS_KEY_ID'),
+    secretAccessKey: config.get<string>('AWS_SECRET_ACCESS_KEY'),
+    region: config.get<string>('AWS_REGION'),
+  });
 
   await app.listen(port, () => {
     // TODO use nest logger

@@ -11,7 +11,7 @@ export class Disc {
   @Column()
   artist: string;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'date' })
   release_date: Date;
 
   @Column() // TODO change to enum

@@ -6,11 +6,26 @@ import { Disc } from "./entities/disc.entity";
 export class DiscsRepository extends Repository<Disc> {
 
   async createDisc(discData: Disc): Promise<Disc> {
+    const existing: Disc = await this.findOne({
+      title: discData.title,
+      artist: discData.artist,
+      release_date: discData.release_date,
+      track_list: discData.track_list
+    })
+
+    if (existing) {
+      throw new HttpException(`Disc with supplied info already exists`, 409);
+    }
+
     const entity: Disc = this.create(discData);
 
     await this.save(entity);
 
     return entity;
+  }
+
+  async addImages(discId: number, imagesIds: number[]) {
+    return await this.update(discId, { images: imagesIds });
   }
 
   async findAll(): Promise<Disc[]> {

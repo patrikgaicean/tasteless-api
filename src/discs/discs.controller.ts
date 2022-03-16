@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { DiscsService } from './discs.service';
 import { CreateDiscDto } from './dto/create-disc.dto';
-import { UpdateDiscDto } from './dto/update-disc.dto';
+import { FilesUploadDto } from '../files/dto/file-upload.dto';
 
 @Controller('discs')
 @ApiTags('discs')
@@ -10,8 +12,21 @@ export class DiscsController {
   constructor(private readonly discsService: DiscsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async create(@Body() discData: CreateDiscDto) {
     return this.discsService.create(discData);
+  }
+
+  @Post(':id/images')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FilesInterceptor('files'))
+  @ApiConsumes('multipart/form-data')
+  async uploadImages(
+    @Param('id') id: string,
+    @Body() _: FilesUploadDto,
+    @UploadedFiles() images: Express.Multer.File[]
+  ) {
+    return this.discsService.uploadImages(+id, images);
   }
 
   @Get()

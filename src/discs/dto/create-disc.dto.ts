@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsISO8601, IsNotEmpty, IsString, Matches, ValidateNested } from "class-validator";
+import { IsArray, IsISO8601, IsNotEmpty, IsString, Matches } from "class-validator";
 
 export class CreateDiscDto {
   @ApiProperty()
@@ -26,10 +26,10 @@ export class CreateDiscDto {
   @IsString()
   @IsNotEmpty()
   description: string;
-
+  
   @ApiProperty()
-  @IsArray()
+  @IsArray()  
   @IsNotEmpty()
-  @Matches(/[A-Z][\d] [- a-zA-Z\d]+/, { each: true })
+  @Matches(/[A-Z][\d]{1,2} .+/, { each: true })
   trackList: string[];
 }
