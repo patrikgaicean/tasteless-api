@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ImageDto } from '../files/dto/image.dto';
 import { FilesService } from '../files/files.service';
 import { DiscsRepository } from './discs.repository';
 import { CreateDiscDto } from './dto/create-disc.dto';
@@ -13,13 +14,24 @@ export class DiscsService {
   ) {}
 
   async create(discData: CreateDiscDto) {
-    const entity: Disc = await this.discsRepository.createDisc(this.toEntity(discData));
+    const entity: Disc = await this.discsRepository.createDisc({
+      title: discData.title,
+      artist: discData.artist,
+      release_date: new Date(discData.releaseDate),
+      genre: discData.genre,
+      description: discData.description,
+      track_list: discData.trackList
+    });
 
     return this.toDto(entity);
   }
 
-  async uploadImage(imageBuffer: Buffer, filename: string) {
-    return this.filesService.uploadImage(imageBuffer, filename);
+  async uploadImages(discId: number, files: Express.Multer.File[]) {
+    const images: ImageDto[] = await this.filesService.uploadImages(files);
+
+    await this.discsRepository.addImages(discId, images.map(img => img.imageId));
+
+    return;
   }
 
   async findAll() {
@@ -45,7 +57,8 @@ export class DiscsService {
       release_date: new Date(dto.releaseDate),
       genre: dto.genre,
       description: dto.description,
-      track_list: dto.trackList
+      track_list: dto.trackList,
+      images: dto.images
     }
   }
 
@@ -57,7 +70,8 @@ export class DiscsService {
       releaseDate: `${entity.release_date}`,
       genre: entity.genre,
       description: entity.description,
-      trackList: entity.track_list
+      trackList: entity.track_list,
+      images: entity.images
     }
   }
 }
