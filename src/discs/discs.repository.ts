@@ -1,42 +1,46 @@
-import { HttpException } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import {EntityRepository, Repository} from "typeorm";
+import PostgresErrorCode from "../database/postgresErrorCode.enum";
 import { Disc } from "./entities/disc.entity";
 
 @EntityRepository(Disc)
 export class DiscsRepository extends Repository<Disc> {
 
-  async createDisc(discData: Disc): Promise<Disc> {
+  async createDisc(data: Disc): Promise<Disc> {
     const existing: Disc = await this.findOne({
-      title: discData.title,
-      artist: discData.artist,
-      release_date: discData.release_date,
-      track_list: discData.track_list
+      title: data.title,
+      artist: data.artist,
+      release_date: data.release_date,
+      track_list: data.track_list
     })
 
     if (existing) {
       throw new HttpException(`Disc with supplied info already exists`, 409);
     }
 
-    const entity: Disc = this.create(discData);
+    const entity: Disc = this.create(data);
 
-    await this.save(entity);
+    try {
+      await this.save(entity);
+    } catch (error) {
+      if (error?.code === PostgresErrorCode.UniqueViolation) {
+        throw new HttpException('User with that email already exists', HttpStatus.BAD_REQUEST);
+      }
+      throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     return entity;
-  }
-
-  async addImages(discId: number, imagesIds: number[]) {
-    return await this.update(discId, { images: imagesIds });
   }
 
   async findAll(): Promise<Disc[]> {
     return await this.find();
   }
 
-  async findById(id: number): Promise<Disc> {
-    const entity: Disc = await this.findOne({ disc_id: id })
+  async findById(disc_id: number): Promise<Disc> {
+    const entity: Disc = await this.findOne({ disc_id })
 
     if (!entity) {
-      throw new HttpException(`Disc with id ${id} not found`, 404);
+      throw new HttpException(`Disc with id ${disc_id} not found`, 404);
     }
 
     return entity;

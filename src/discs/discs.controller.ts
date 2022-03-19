@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, UseInterceptors, UploadedFiles, Res } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
@@ -29,18 +29,24 @@ export class DiscsController {
     return this.discsService.uploadImages(+id, images);
   }
 
+  @Get(':id/images')
+  @UseGuards(JwtAuthGuard)
+  async getDiscImages(
+    @Param('id') id: number,
+  ) {
+    return await this.discsService.getDiscImages(+id);
+  }
+
   @Get()
+  @UseGuards(JwtAuthGuard)
   async findAll() {
     return this.discsService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.discsService.findOne(+id);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.discsService.remove(+id);
-  }
 }

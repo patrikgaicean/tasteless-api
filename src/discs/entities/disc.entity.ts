@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { DiscImage } from "../../files/entities/disc-image.entity";
+import { Product } from "../../products/entities/product.entity";
 
 @Entity('discs')
 export class Disc {
@@ -23,6 +25,9 @@ export class Disc {
   @Column("text", { array: true })
   track_list: string[];
 
-  @Column("int", { array: true, default: [] })
-  images?: number[];
+  @OneToMany(() => Product, (product: Product) => product.disc)
+  products?: Product[];
+
+  @OneToMany(() => DiscImage, (disc: DiscImage) => disc.owner)
+  images?: DiscImage[];
 }

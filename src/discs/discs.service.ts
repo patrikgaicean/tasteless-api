@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ImageDto } from '../files/dto/image.dto';
 import { FilesService } from '../files/files.service';
 import { DiscsRepository } from './discs.repository';
@@ -14,24 +14,34 @@ export class DiscsService {
   ) {}
 
   async create(discData: CreateDiscDto) {
-    const entity: Disc = await this.discsRepository.createDisc({
-      title: discData.title,
-      artist: discData.artist,
-      release_date: new Date(discData.releaseDate),
-      genre: discData.genre,
-      description: discData.description,
-      track_list: discData.trackList
-    });
+    const entity: Disc = await this.discsRepository.createDisc(this.toEntity(discData));
 
     return this.toDto(entity);
   }
 
   async uploadImages(discId: number, files: Express.Multer.File[]) {
-    const images: ImageDto[] = await this.filesService.uploadImages(files);
+    await this.filesService.uploadImages(files, discId, 'disc');
+  }
 
-    await this.discsRepository.addImages(discId, images.map(img => img.imageId));
+  async getDiscImages(discId: number) {
+    const discWithImages = await this.discsRepository.findOne(
+      { disc_id: discId },
+      { relations: ['images'] }
+    );
 
-    return;
+    if (discWithImages) {
+      return Promise.all(
+        discWithImages.images.map(async (image) => {
+          const url = await this.filesService.generatePresignedUrl(image.key);
+          return {
+            ...image,
+            url
+          }
+        })
+      )
+    }
+
+    throw new NotFoundException('User with this id does not exist');
   }
 
   async findAll() {
@@ -46,10 +56,6 @@ export class DiscsService {
     return this.toDto(entity);
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} disc`;
-  }
-
   toEntity(dto: DiscDto): Disc {
     return {
       title: dto.title,
@@ -57,8 +63,7 @@ export class DiscsService {
       release_date: new Date(dto.releaseDate),
       genre: dto.genre,
       description: dto.description,
-      track_list: dto.trackList,
-      images: dto.images
+      track_list: dto.trackList
     }
   }
 
@@ -70,8 +75,7 @@ export class DiscsService {
       releaseDate: `${entity.release_date}`,
       genre: entity.genre,
       description: entity.description,
-      trackList: entity.track_list,
-      images: entity.images
+      trackList: entity.track_list
     }
   }
 }
