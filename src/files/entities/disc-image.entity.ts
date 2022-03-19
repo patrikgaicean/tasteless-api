@@ -11,5 +11,5 @@ export class DiscImage {
 
   @ManyToOne(() => Disc, (owner: Disc) => owner.images)
   @JoinColumn({ name: 'disc_id' })
-  owner: Disc;
+  owner?: Disc;
 }

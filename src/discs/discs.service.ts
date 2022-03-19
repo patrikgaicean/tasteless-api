@@ -13,8 +13,8 @@ export class DiscsService {
     private filesService: FilesService
   ) {}
 
-  async create(discData: CreateDiscDto) {
-    const entity: Disc = await this.discsRepository.createDisc(this.toEntity(discData));
+  async create(data: CreateDiscDto) {
+    const entity: Disc = await this.discsRepository.createDisc(this.toEntity(data));
 
     return this.toDto(entity);
   }
