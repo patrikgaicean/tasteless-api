@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import PostgresErrorCode from '../database/postgresErrorCode.enum';
 import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -18,35 +17,21 @@ export class AuthService {
   public async register(userData: RegisterDto) {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    try {
-      const createdUser = await this.usersRepository.createUser({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        display_name: userData.displayName,
-        email: userData.email,
-        password: hashedPassword
-      });
-
-      return createdUser;
-    } catch (error) {
-      console.error(error)
-      if (error?.code === PostgresErrorCode.UniqueViolation) {
-        throw new HttpException('User with that email already exists', HttpStatus.BAD_REQUEST);
-      }
-      throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await this.usersRepository.createUser({
+      first_name: userData.firstName,
+      last_name: userData.lastName,
+      display_name: userData.displayName,
+      email: userData.email,
+      password: hashedPassword
+    });
   }
 
   public async getAuthenticatedUser(email: string, plainTextPassword: string) {
-    try {
-      const { password, ...user } = await this.usersRepository.findByEmail(email);
+    const { password, ...user } = await this.usersRepository.findByEmail(email);
 
-      await this.verifyPassword(plainTextPassword, password);
+    await this.verifyPassword(plainTextPassword, password);
 
-      return user;
-    } catch (error) {
-      throw new HttpException('Wrong credentials provided', HttpStatus.BAD_REQUEST);
-    }
+    return user;
   }
    
   private async verifyPassword(plainTextPassword: string, hashedPassword: string) {

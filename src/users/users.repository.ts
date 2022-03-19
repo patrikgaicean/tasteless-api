@@ -1,5 +1,6 @@
-import { HttpException } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import {EntityRepository, Repository} from "typeorm";
+import PostgresErrorCode from "../database/postgresErrorCode.enum";
 import { User } from "./entities/user.entity";
 
 @EntityRepository(User)
@@ -14,11 +15,11 @@ export class UsersRepository extends Repository<User> {
     })
   }
 
-  async findById(id: number): Promise<User> {
-    const entity: User = await this.findOne({ user_id: id })
+  async findById(user_id: number): Promise<User> {
+    const entity: User = await this.findOne({ user_id })
 
     if (!entity) {
-      throw new HttpException(`User with email ${id} not found`, 404);
+      throw new HttpException(`User with email ${user_id} not found`, 404);
     }
 
     const { password, ...user } = entity;
@@ -26,13 +27,20 @@ export class UsersRepository extends Repository<User> {
     return user;
   }
 
-  async createUser(userData: User): Promise<User> {
-    const entity: User = this.create(userData);
-
-    await this.save(entity);
-
+  async createUser(data: User): Promise<User> {
+    const entity: User = this.create(data);
+    
+    try {
+      await this.save(entity);
+    } catch (error) {
+      if (error?.code === PostgresErrorCode.UniqueViolation) {
+        throw new HttpException('User with that email already exists', HttpStatus.BAD_REQUEST);
+      }
+      throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
     const { password, ...user } = entity;
-
+    
     return user;
   }
 

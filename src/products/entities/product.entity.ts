@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Disc } from "../../discs/entities/disc.entity";
+import { ProductImage } from "../../files/entities/product-image.entity";
 
 @Entity('products')
 export class Product {
@@ -14,9 +16,16 @@ export class Product {
   @Column()
   price: number;
 
-  @Column()
-  deleted: boolean;
+  @Column({ default: false })
+  deleted?: boolean;
 
-  @Column("int", { array: true, default: [] })
-  images?: number[];
+  @ManyToOne(() => Disc, (disc: Disc) => disc.products)
+  @JoinColumn({ name: 'disc_id' })
+  disc?: Disc;
+
+  @OneToMany(
+    () => ProductImage,
+    (product: ProductImage) => product.owner
+  )
+  images?: ProductImage[];
 }
