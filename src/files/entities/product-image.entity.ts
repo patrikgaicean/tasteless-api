@@ -11,5 +11,5 @@ export class ProductImage {
 
   @ManyToOne(() => Product, (owner: Product) => owner.images)
   @JoinColumn({ name: 'product_id' })
-  owner: Product;
+  owner?: Product;
 }

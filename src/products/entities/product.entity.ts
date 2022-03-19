@@ -23,9 +23,6 @@ export class Product {
   @JoinColumn({ name: 'disc_id' })
   disc?: Disc;
 
-  @OneToMany(
-    () => ProductImage,
-    (product: ProductImage) => product.owner
-  )
+  @OneToMany(() => ProductImage, (product: ProductImage) => product.owner)
   images?: ProductImage[];
 }

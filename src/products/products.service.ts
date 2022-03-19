@@ -12,9 +12,8 @@ export class ProductsService {
     private filesService: FilesService
   ) {}
 
-  async create(productData: CreateProductDto) {
-    console.log(productData)
-    const entity: Product = await this.productsRepository.createProduct(this.toEntity(productData));
+  async create(data: CreateProductDto) {
+    const entity: Product = await this.productsRepository.createProduct(this.toEntity(data));
 
     return this.toDto(entity);
   }

@@ -21,10 +21,6 @@ export class UsersService {
     return this.toDto(entity);
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
   toDto(entity: User): UserDto {
     return {
       userId: entity.user_id,
