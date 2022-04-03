@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Connection } from 'typeorm';
 import { ProductDto } from '../products/dto/product.dto';
 import { SalesService } from '../sales/sales.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -10,35 +11,47 @@ import { OrdersRepository } from './orders.repository';
 export class OrdersService {
   constructor(
     private ordersRepository: OrdersRepository,
-    private salesService: SalesService
+    private salesService: SalesService,
+    private connection: Connection
   ) {}
 
-  async create(data: CreateOrderDto) {
+  async create(data: CreateOrderDto, userId: number) {
     const { productIds , ...order } = data;
+    const queryRunner = this.connection.createQueryRunner();
 
-    const entity: Order = await this.ordersRepository.createOrder(this.toEntity(order));
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    await this.salesService.createBulk(
-      productIds.map(p => ({ productId: p, orderId: entity.order_id }))
-    );
+    try {
+      const entity: Order = await this.ordersRepository.createOrder(
+        this.toEntity({ userId, ...order }),
+        queryRunner
+      );
 
-    return this.toDto(entity);
+      await this.salesService.createBulk(
+        productIds.map(p => ({ productId: p, orderId: entity.order_id })),
+        queryRunner
+      );
+  
+      await queryRunner.commitTransaction();
+
+      return this.toDto(entity);
+    } catch(error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
-  async findAll() {
-    const entities: Order[] = await this.ordersRepository.findAll();
+  async findAllForUser(userId: number) {
+    const entities: Order[] = await this.ordersRepository.findAllForUser(userId);
 
     return entities.map(e => this.toDto(e));
   }
 
-  async findOne(id: number) {
-    const entity: Order = await this.ordersRepository.findById(id);
-
-    return this.toDto(entity);
-  }
-
-  async findOneDetails(id: number) {
-    const entity: Order = await this.ordersRepository.findById(id);
+  async findOneDetailsForUser(id: number, userId: number) {
+    const entity: Order = await this.ordersRepository.findByUserAndId(id, userId);
 
     const products: ProductDto[] = await this.salesService.findProductsByOrderId(entity.order_id);
 

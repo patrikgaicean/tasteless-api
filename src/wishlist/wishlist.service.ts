@@ -1,26 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { WishlistDto } from './dto/wishlist.dto';
+import { Wishlist } from './entities/wishlist.entity';
+import { WishlistRepository } from './wishlist.repository';
 
 @Injectable()
 export class WishlistService {
-  create(createWishlistDto: CreateWishlistDto) {
-    return 'This action adds a new wishlist';
+  constructor(
+    private wishlistRepository: WishlistRepository,
+  ) {}
+
+  async create(createWishlistDto: CreateWishlistDto, userId: number) {
+    const entity: Wishlist = await this.wishlistRepository.createWishlistItem(
+      this.toEntity({ userId, ...createWishlistDto })
+    );
+
+    return this.toDto(entity);
   }
 
-  findAll() {
-    return `This action returns all wishlist`;
+  async findAllForUser(userId: number) {
+    const entities: Wishlist[] = await this.wishlistRepository.findAllForUser(userId);
+
+    return entities.map(e => this.toDto(e));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wishlist`;
+  async findOneDetailsForUser(id: number, userId: number) {
+    const entity: Wishlist = await this.wishlistRepository.findDiscByWishlistAndUserId(id, userId);
+
+    // si de fapt trebuie sa returneze doar title, artist si link la imaginea discului
+
+    return {
+      ...this.toDto(entity),
+      ...entity.disc // toDto
+    }
   }
 
-  update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    return `This action updates a #${id} wishlist`;
+  async removeForUser(id: number, userId: number) {
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} wishlist`;
+  toEntity(dto: WishlistDto): Wishlist {
+    return {
+      wishlist_id: dto.wishlistId,
+      user_id: dto.userId,
+      disc_id: dto.discId
+    }
   }
+
+  toDto(entity: Wishlist): WishlistDto {
+    return {
+      wishlistId: entity.wishlist_id,
+      userId: entity.user_id,
+      discId: entity.disc_id
+    }
+  }
+
 }

@@ -33,7 +33,7 @@ export class DiscsRepository extends Repository<Disc> {
   }
 
   async findAll(): Promise<Disc[]> {
-    return await this.find();
+    return await this.find({ relations: ['images'] });
   }
 
   async findById(disc_id: number): Promise<Disc> {
@@ -44,5 +44,12 @@ export class DiscsRepository extends Repository<Disc> {
     }
 
     return entity;
+  }
+
+  async findDiscWithImages(disc_id: number): Promise<Disc> {
+    return await this.findOne(
+      { disc_id },
+      { relations: ['images'] }
+    );
   }
 }

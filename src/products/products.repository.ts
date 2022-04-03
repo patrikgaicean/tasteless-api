@@ -17,10 +17,6 @@ export class ProductsRepository extends Repository<Product> {
     return entity;
   }
 
-  async findAll(): Promise<Product[]> {
-    return await this.find();
-  }
-
   async findAllByDiscId(disc_id: number): Promise<Product[]> {
     return await this.find({ disc_id });
   }

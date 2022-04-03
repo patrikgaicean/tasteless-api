@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
@@ -14,7 +14,7 @@ export class FilesService {
     private configService: ConfigService
   ) {}
 
-  async uploadImage(dataBuffer: Buffer, filename: string, ownerId: number, destination: string) { // TODO change to enum
+  async uploadImage(dataBuffer: Buffer, filename: string, ownerId: number, destination: string, main?: boolean) { // TODO change destination to enum
     const s3 = new S3();
     const uploadResult = await s3.upload({
       Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
@@ -27,6 +27,7 @@ export class FilesService {
       case 'disc': {
         return await this.discImagesRepository.createImage({
           key: uploadResult.Key,
+          main,
           owner: {
             disc_id: ownerId
           } as any
@@ -45,8 +46,37 @@ export class FilesService {
   }
 
   async uploadImages(files: Express.Multer.File[], discId: number, destination: string): Promise<ImageDto[]> {
+    switch (destination) {
+      case 'disc': {
+        const exists = await this.discImagesRepository.findOneByDiscId(discId);
+
+        if (exists) {
+          throw new BadRequestException(`Images already exist. Try using update instead.`);
+        }
+
+        break;
+      }
+
+      case 'product': {
+        const exists = await this.productImagesRepository.findOneByDiscId(discId);
+
+        if (exists) {
+          throw new BadRequestException(`Images already exist. Try using update instead.`);
+        }
+        
+        break;
+      }
+    }
+
+    let first = true;
+
     return await Promise.all(files.map(async (file) => {
-      return this.uploadImage(file.buffer, file.originalname, discId, destination);
+      if (first) {
+        first = false;
+        return this.uploadImage(file.buffer, file.originalname, discId, destination, true);
+      } else {
+        return this.uploadImage(file.buffer, file.originalname, discId, destination);
+      }
     }));
   }
 

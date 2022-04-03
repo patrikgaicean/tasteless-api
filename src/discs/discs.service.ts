@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ImageDto } from '../files/dto/image.dto';
+import { DiscImage } from '../files/entities/disc-image.entity';
 import { FilesService } from '../files/files.service';
 import { DiscsRepository } from './discs.repository';
 import { CreateDiscDto } from './dto/create-disc.dto';
@@ -24,10 +24,7 @@ export class DiscsService {
   }
 
   async getDiscImages(discId: number) {
-    const discWithImages = await this.discsRepository.findOne(
-      { disc_id: discId },
-      { relations: ['images'] }
-    );
+    const discWithImages: Disc = await this.discsRepository.findDiscWithImages(discId);
 
     if (discWithImages) {
       return Promise.all(
@@ -47,13 +44,33 @@ export class DiscsService {
   async findAll() {
     const entities: Disc[] = await this.discsRepository.findAll();
 
-    return entities.map(e => this.toDto(e));
+    return Promise.all(
+      entities.map(async (e) => {
+        const dto = this.toDto(e);
+
+        return {
+          discId: dto.discId, 
+          title: dto.title,
+          artist: dto.artist,
+          images: (await this.getDiscImages(e.disc_id)).map(img => {
+            return {
+              url: img.url,
+              main: img.main
+            }
+          })
+        }
+      })
+    )
   }
 
-  async findOne(id: number) {
-    const entity: Disc = await this.discsRepository.findById(id);
+  async findOne(discId: number) {
+    const entity: Disc = await this.discsRepository.findById(discId);
+    const images = await this.getDiscImages(entity.disc_id);
 
-    return this.toDto(entity);
+    return {
+      ...this.toDto(entity),
+      images: images.map(img => ({ url: img.url, main: img.main}))
+    }
   }
 
   toEntity(dto: DiscDto): Disc {

@@ -43,17 +43,12 @@ export class ProductsService {
     throw new NotFoundException('User with this id does not exist');
   }
 
-  async findAll() {
-    const entities: Product[] = await this.productsRepository.findAll();
+  async findAllByDiscId(discId: number) {
+    const entities: Product[] = await this.productsRepository.findAllByDiscId(discId);
 
     return entities.map(e => this.toDto(e));
   }
 
-  async findOne(id: number) {
-    const entity: Product = await this.productsRepository.findById(id);
-
-    return this.toDto(entity);
-  }
 
   toEntity(dto: ProductDto): Product {
     return {
