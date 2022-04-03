@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ProductDto } from '../products/dto/product.dto';
+import { QueryRunner } from 'typeorm';
+import { DiscsService } from '../discs/discs.service';
 import { ProductsService } from '../products/products.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { SaleDto } from './dto/sale.dto';
@@ -10,7 +11,8 @@ import { SalesRepository } from './sales.repository';
 export class SalesService {
   constructor(
     private salesRepository: SalesRepository,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private discsService: DiscsService,
   ) {}
 
   async create(data: CreateSaleDto): Promise<SaleDto> {
@@ -19,22 +21,22 @@ export class SalesService {
     return this.toDto(entity);
   }
 
-  async createBulk(data: CreateSaleDto[]): Promise<SaleDto[]> {
+  async createBulk(data: CreateSaleDto[], queryRunner?: QueryRunner): Promise<SaleDto[]> {
     const entities: Sale[] = await this.salesRepository.createSalesBulk(
-      data.map(d => this.toEntity(d))
+      data.map(d => this.toEntity(d)),
+      queryRunner
     );
 
     return entities.map(e => this.toDto(e));
   }
 
-  async findProductsByOrderId(orderId: number): Promise<ProductDto[]> {
+  async findProductsByOrderId(orderId: number): Promise<any[]> {
     const entities: Sale[] = await this.salesRepository.findProductsByOrderId(orderId)
 
     return entities.map(e => {
-      const { product, ...sale } = e;
-
       return {
-        ...this.productsService.toDto(product)
+        ...this.productsService.toDto(e.product),
+        ...this.discsService.toDto(e.product.disc)
       }
     });
   }

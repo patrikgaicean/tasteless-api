@@ -13,7 +13,7 @@ export class Product {
   @Column() // TODO change to enum
   condition: string;
 
-  @Column()
+  @Column({ type: 'float' })
   price: number;
 
   @Column({ default: false })

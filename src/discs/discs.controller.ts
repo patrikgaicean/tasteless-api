@@ -38,13 +38,11 @@ export class DiscsController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll() {
     return this.discsService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.discsService.findOne(+id);
   }

@@ -11,6 +11,7 @@ import { FilesModule } from '../files/files.module';
     FilesModule
   ],
   controllers: [DiscsController],
-  providers: [DiscsService]
+  providers: [DiscsService],
+  exports: [DiscsService]
 })
 export class DiscsModule {}

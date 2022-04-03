@@ -30,22 +30,14 @@ export class ProductsController {
   }
 
   @Get(':id/images')
-  @UseGuards(JwtAuthGuard)
   async getDiscImages(
     @Param('id') id: number,
   ) {
     return await this.productsService.getProductImages(+id);
   }
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  async findAll() {
-    return this.productsService.findAll();
-  }
-
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  async findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  @Get(':discId')
+  async findAllByDiscId(@Param('discId') discId: string) {
+    return this.productsService.findAllByDiscId(+discId);
   }
 }
