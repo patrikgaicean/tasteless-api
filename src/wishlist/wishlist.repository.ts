@@ -18,15 +18,10 @@ export class WishlistRepository extends Repository<Wishlist> {
   }
 
   async findAllForUser(user_id: number): Promise<Wishlist[]> {
-    return await this.find({ user_id });
-  }
-
-  async findDiscByWishlistAndUserId(wishlist_id: number, user_id: number): Promise<Wishlist> {
     return await this.createQueryBuilder('wishlist')
       .leftJoinAndSelect(`wishlist.disc`, `disc`)
-      .where(`wishlist_id = :id`, { id: wishlist_id })
-      .andWhere(`user_id = :id`, { id: user_id })
-      .getOne();
+      .where(`user_id = :id`, { id: user_id })
+      .getMany();
   }
 
 }

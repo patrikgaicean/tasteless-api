@@ -22,12 +22,6 @@ export class WishlistController {
     return this.wishlistService.findAllForUser(req.user.userId);
   }
 
-  @Get(':id/details')
-  @UseGuards(JwtAuthGuard)
-  findOneDetailsForUser(@Req() req: RequestWithUserDto, @Param('id') id: string) {
-    return this.wishlistService.findOneDetailsForUser(+id, req.user.userId);
-  }
-
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   remove(@Req() req: RequestWithUserDto, @Param('id') id: string) {

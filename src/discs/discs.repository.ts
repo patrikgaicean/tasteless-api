@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import {EntityRepository, Repository} from "typeorm";
+import {Brackets, EntityRepository, Repository} from "typeorm";
 import PostgresErrorCode from "../database/postgresErrorCode.enum";
 import { Disc } from "./entities/disc.entity";
 
@@ -32,8 +32,8 @@ export class DiscsRepository extends Repository<Disc> {
     return entity;
   }
 
-  async findAll(): Promise<Disc[]> {
-    return await this.find({ relations: ['images'] });
+  async findAll(user_id?: number): Promise<Disc[]> {
+    return await this.find({ relations: ['images'] })
   }
 
   async findById(disc_id: number): Promise<Disc> {
