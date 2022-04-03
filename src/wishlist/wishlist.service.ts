@@ -36,7 +36,7 @@ export class WishlistService {
   }
 
   async removeForUser(id: number, userId: number) {
-
+    return await this.wishlistRepository.removeForUser(id, userId);
   }
 
   toEntity(dto: WishlistDto): Wishlist {
