@@ -31,4 +31,13 @@ export class ProductsRepository extends Repository<Product> {
     return entity;
   }
 
+  async findLowestPrice(disc_id: number): Promise<number> {
+    const { lowestPrice } = await this.createQueryBuilder('products')
+      .select('MIN(products.price)', 'lowestPrice')
+      .where('products.disc_id = :id', { id: disc_id })
+      .getRawOne();
+
+    return lowestPrice;
+  }
+
 }
