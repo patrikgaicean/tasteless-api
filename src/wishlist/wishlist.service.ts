@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { DiscsService } from '../discs/discs.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
-import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { WishlistDto } from './dto/wishlist.dto';
 import { Wishlist } from './entities/wishlist.entity';
 import { WishlistRepository } from './wishlist.repository';
@@ -9,6 +9,7 @@ import { WishlistRepository } from './wishlist.repository';
 export class WishlistService {
   constructor(
     private wishlistRepository: WishlistRepository,
+    private discsService: DiscsService
   ) {}
 
   async create(createWishlistDto: CreateWishlistDto, userId: number) {
@@ -22,18 +23,16 @@ export class WishlistService {
   async findAllForUser(userId: number) {
     const entities: Wishlist[] = await this.wishlistRepository.findAllForUser(userId);
 
-    return entities.map(e => this.toDto(e));
-  }
+    return Promise.all(
+      entities.map(async (e) => {
+        const dto = this.toDto(e);
 
-  async findOneDetailsForUser(id: number, userId: number) {
-    const entity: Wishlist = await this.wishlistRepository.findDiscByWishlistAndUserId(id, userId);
-
-    // si de fapt trebuie sa returneze doar title, artist si link la imaginea discului
-
-    return {
-      ...this.toDto(entity),
-      ...entity.disc // toDto
-    }
+        return {
+          ...dto,
+          ...await this.discsService.findOne(e.disc_id, false)
+        }
+      })
+    )
   }
 
   async removeForUser(id: number, userId: number) {

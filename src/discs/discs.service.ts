@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DiscImage } from '../files/entities/disc-image.entity';
 import { FilesService } from '../files/files.service';
+import { ProductsRepository } from '../products/products.repository';
 import { DiscsRepository } from './discs.repository';
 import { CreateDiscDto } from './dto/create-disc.dto';
 import { DiscDto } from './dto/disc.dto';
@@ -10,6 +11,7 @@ import { Disc } from './entities/disc.entity';
 export class DiscsService {
   constructor(
     private discsRepository: DiscsRepository,
+    private productsRepository: ProductsRepository,
     private filesService: FilesService
   ) {}
 
@@ -57,19 +59,33 @@ export class DiscsService {
               url: img.url,
               main: img.main
             }
-          })
+          }),
+          lowestPrice: await this.productsRepository.findLowestPrice(e.disc_id)
         }
       })
     )
   }
 
-  async findOne(discId: number) {
+  async findOne(discId: number, details: boolean = true) {
     const entity: Disc = await this.discsRepository.findById(discId);
     const images = await this.getDiscImages(entity.disc_id);
+    const lowestPrice = await this.productsRepository.findLowestPrice(entity.disc_id);
+
+    let disc = {}
+    if (details) {
+      disc = this.toDto(entity);
+    } else {
+      disc = {
+        discId: entity.disc_id,
+        title: entity.title,
+        artist: entity.artist
+      }
+    }
 
     return {
-      ...this.toDto(entity),
-      images: images.map(img => ({ url: img.url, main: img.main}))
+      ...disc,
+      images: images.map(img => ({ url: img.url, main: img.main})),
+      lowestPrice
     }
   }
 
