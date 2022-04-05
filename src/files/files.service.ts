@@ -14,7 +14,7 @@ export class FilesService {
     private configService: ConfigService
   ) {}
 
-  async uploadImage(dataBuffer: Buffer, filename: string, ownerId: number, destination: string, main?: boolean) { // TODO change destination to enum
+  async uploadImage(dataBuffer: Buffer, filename: string, ownerId: number, destination: string, main?: boolean) {
     const s3 = new S3();
     const uploadResult = await s3.upload({
       Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),

@@ -1,9 +1,11 @@
+import { Genre } from "./interfaces";
+
 export class DiscDto {
   discId?: number;
   title: string;
   artist: string;
   releaseDate: string;
-  genre: string; // TODO change to enum
+  genre: Genre;
   description: string;
   trackList: string[];
 }

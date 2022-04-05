@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Address } from "../../addresses/entities/address.entity";
 import { Order } from "../../orders/entities/order.entity";
 import { Wishlist } from "../../wishlist/entities/wishlist.entity";
 
@@ -21,6 +22,9 @@ export class User {
 
   @Column()
   password?: string;
+
+  @OneToMany(() => Address, (address: Address) => address.owner)
+  addresses?: Address[];
 
   @OneToMany(() => Order, (order: Order) => order.owner)
   orders?: Order[];

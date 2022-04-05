@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Disc } from "../../discs/entities/disc.entity";
 import { ProductImage } from "../../files/entities/product-image.entity";
+import { Condition } from "../dto/interfaces";
 
 @Entity('products')
 export class Product {
@@ -10,8 +11,11 @@ export class Product {
   @Column()
   disc_id: number;
 
-  @Column() // TODO change to enum
-  condition: string;
+  @Column({
+    type: 'enum',
+    enum: Condition
+  })
+  condition: Condition;
 
   @Column({ type: 'float' })
   price: number;

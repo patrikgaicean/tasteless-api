@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsISO8601, IsNotEmpty, IsNumber } from "class-validator";
+import { IsArray, IsEnum, IsISO8601, IsNotEmpty, IsNumber } from "class-validator";
+import { PaymentMethod, ShippingMethod } from "./interfaces";
 
 export class CreateOrderDto {
   @ApiProperty()
@@ -8,7 +9,19 @@ export class CreateOrderDto {
   orderDate: string;
 
   @ApiProperty()
+  @IsNumber()
+  addressId: number;
+
+  @ApiProperty()
   @IsArray()
   @IsNumber({}, { each: true })
   productIds: number[]
+
+  @ApiProperty()
+  @IsEnum(ShippingMethod)
+  shippingType: ShippingMethod;
+
+  @ApiProperty()
+  @IsEnum(PaymentMethod)
+  paymentMethod: PaymentMethod;
 }

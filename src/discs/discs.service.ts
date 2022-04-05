@@ -1,19 +1,106 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DiscImage } from '../files/entities/disc-image.entity';
 import { FilesService } from '../files/files.service';
 import { ProductsRepository } from '../products/products.repository';
 import { DiscsRepository } from './discs.repository';
 import { CreateDiscDto } from './dto/create-disc.dto';
 import { DiscDto } from './dto/disc.dto';
 import { Disc } from './entities/disc.entity';
+import { bandNames } from './mock/bands';
+import { albumNames } from './mock/albums';
+import { createImage } from './mock/draw';
+import { lorem } from './mock/lorem';
+import { genreArray } from './dto/interfaces';
+import { ProductsService } from '../products/products.service';
+import { CreateProductDto } from '../products/dto/create-product.dto';
+import { conditionArray } from '../products/dto/interfaces';
 
 @Injectable()
 export class DiscsService {
   constructor(
     private discsRepository: DiscsRepository,
     private productsRepository: ProductsRepository,
+    private productsService: ProductsService,
     private filesService: FilesService
   ) {}
+
+  async mockDiscs(no: number) {
+    const payloads = [];
+    const totalAlbums = albumNames.length;
+    let currentAlbum = 0;
+    let totalProducts = 0;
+
+    bandNames.slice(0, no).forEach(band => {
+      const albumNo = this.getRandomInt(1, 3);
+      
+      for (let i = 0; i < albumNo; i++) {
+        if (currentAlbum === totalAlbums) {
+          currentAlbum = 0;
+        }
+
+        const releaseDate = `${this.randomDate(new Date(1970, 0, 1), new Date())}`
+        const trackList = [
+          `A1 ${lorem.generateWords(this.getRandomInt(1, 3))}`,
+          `A2 ${lorem.generateWords(this.getRandomInt(1, 3))}`,
+          `A3 ${lorem.generateWords(this.getRandomInt(1, 3))}`,
+          `A4 ${lorem.generateWords(this.getRandomInt(1, 3))}`,
+          `B1 ${lorem.generateWords(this.getRandomInt(1, 3))}`,
+          `B2 ${lorem.generateWords(this.getRandomInt(1, 3))}`,
+          `B3 ${lorem.generateWords(this.getRandomInt(1, 3))}`,
+          `B4 ${lorem.generateWords(this.getRandomInt(1, 3))}`,
+        ]
+
+        payloads.push({
+          title: albumNames[currentAlbum++],
+          artist: band,
+          releaseDate,
+          genre: genreArray[Math.floor(Math.random() * genreArray.length)],
+          description: lorem.generateSentences(this.getRandomInt(3, 6)),
+          trackList
+        } as CreateDiscDto)
+      }
+    })
+
+    const payloadsWithImages = payloads.map(payload => {
+      return {
+        ...payload,
+        imageBuffer: createImage()
+      }
+    })
+
+    await Promise.all(payloadsWithImages.map(async (p) => {
+      // create disc
+      const { disc_id } = await this.discsRepository.createDisc(this.toEntity(p));
+
+      // add image for disc
+      await this.filesService.uploadImage(
+        p.imageBuffer,
+        `${this.getRandomInt(1, 100)}${lorem.generateWords(1)}${this.getRandomInt(1, 120)}`,
+        disc_id,
+        'disc',
+        true
+      )
+
+      // add products to disc
+      const productNo = this.getRandomInt(0, 7);
+      const productPayload = [];
+
+      for (let i = 0; i < productNo; i++) {
+        productPayload.push({
+          discId: disc_id,
+          condition: conditionArray[Math.floor(Math.random() * conditionArray.length)],
+          price: this.getRandomFloat(10, 60)
+        } as CreateProductDto)
+      }
+
+      totalProducts += productPayload.length;
+
+      Promise.all(productPayload.map(async (pp) => {
+        await this.productsService.create(pp);
+      }))
+    }))
+
+    return { message: `Created ${payloads.length} discs with a total of ${totalProducts} products.`}
+  }
 
   async create(data: CreateDiscDto) {
     const entity: Disc = await this.discsRepository.createDisc(this.toEntity(data));
@@ -111,4 +198,21 @@ export class DiscsService {
       trackList: entity.track_list
     }
   }
+
+  private getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+  }
+
+  private getRandomFloat(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Number((Math.random() * (max - min) + min).toFixed(2)); //The maximum is exclusive and the minimum is inclusive
+  }
+
+  private randomDate(start, end) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  }
+  
 }
