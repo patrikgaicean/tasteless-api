@@ -47,7 +47,14 @@ export class OrdersService {
   async findAllForUser(userId: number) {
     const entities: Order[] = await this.ordersRepository.findAllForUser(userId);
 
-    return entities.map(e => this.toDto(e));
+    return Promise.all(entities.map(async(e) => {
+      const products: ProductDto[] = await this.salesService.findProductsByOrderId(e.order_id);
+
+      return {
+        ...this.toDto(e),
+        products
+      }
+    }))
   }
 
   async findOneDetailsForUser(id: number, userId: number) {
@@ -65,7 +72,11 @@ export class OrdersService {
     return {
       order_id: dto.orderId,
       user_id: dto.userId,
+      address_id: dto.addressId,
       order_date: new Date(dto.orderDate),
+      shipping_type: dto.shippingType,
+      payment_method: dto.paymentMethod,
+      paid: dto.paid,
       shipped: dto.shipped,
       delivered: dto.delivered
     }
@@ -75,7 +86,11 @@ export class OrdersService {
     return {
       orderId: entity.order_id,
       userId: entity.user_id,
+      addressId: entity.address_id,
       orderDate: `${entity.order_date}`,
+      shippingType: entity.shipping_type,
+      paymentMethod: entity.payment_method,
+      paid: entity.paid,
       shipped: entity.shipped,
       delivered: entity.delivered
     }

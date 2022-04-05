@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { DiscImage } from "../../files/entities/disc-image.entity";
 import { Product } from "../../products/entities/product.entity";
+import { Genre } from "../dto/interfaces";
 
 @Entity('discs')
 export class Disc {
@@ -16,8 +17,11 @@ export class Disc {
   @Column({ type: 'date' })
   release_date: Date;
 
-  @Column() // TODO change to enum
-  genre: string;
+  @Column({
+    type: 'enum',
+    enum: Genre
+  })
+  genre: Genre;
 
   @Column()
   description: string;

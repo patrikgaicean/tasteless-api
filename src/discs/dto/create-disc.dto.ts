@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsISO8601, IsNotEmpty, IsString, Matches } from "class-validator";
+import { IsArray, IsEnum, IsISO8601, IsNotEmpty, IsString, Matches } from "class-validator";
+import { Genre } from "./interfaces";
 
 export class CreateDiscDto {
   @ApiProperty()
@@ -18,9 +19,8 @@ export class CreateDiscDto {
   releaseDate: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  genre: string; // TODO change to enum
+  @IsEnum(Genre)
+  genre: Genre;
 
   @ApiProperty()
   @IsString()

@@ -33,12 +33,12 @@ export class SalesService {
   async findProductsByOrderId(orderId: number): Promise<any[]> {
     const entities: Sale[] = await this.salesRepository.findProductsByOrderId(orderId)
 
-    return entities.map(e => {
+    return Promise.all(entities.map(async (e) => {
       return {
         ...this.productsService.toDto(e.product),
-        ...this.discsService.toDto(e.product.disc)
+        imageUrl: (await this.discsService.getDiscImages(e.product.disc_id)).filter(img => img.main)[0].url,
       }
-    });
+    }));
   }
 
   toEntity(dto: SaleDto): Sale {

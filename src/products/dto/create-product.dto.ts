@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsString, Min } from "class-validator";
+import { IsEnum, IsNumber, Min } from "class-validator";
+import { Condition } from "./interfaces";
 
 export class CreateProductDto {
   @ApiProperty()
@@ -7,8 +8,8 @@ export class CreateProductDto {
   discId: number;
 
   @ApiProperty()
-  @IsString()
-  condition: string;
+  @IsEnum(Condition)
+  condition: Condition;
 
   @ApiProperty()
   @IsNumber()

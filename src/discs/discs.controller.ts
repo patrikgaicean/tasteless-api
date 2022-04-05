@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, UseInterceptors, UploadedFiles, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
@@ -45,6 +45,11 @@ export class DiscsController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.discsService.findOne(+id);
+  }
+
+  @Post('mock-discs/:no')
+  async mockDiscs(@Param('no') no: string) {
+    return await this.discsService.mockDiscs(+no);
   }
 
 }

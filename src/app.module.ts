@@ -12,6 +12,7 @@ import { getEnvPath } from './common/helper/env.helper';
 import { validate } from './common/helper/env.validation';
 import { TypeOrmConfigService } from './database/typeorm.service';
 import { AuthModule } from './auth/auth.module';
+import { AddressesModule } from './addresses/addresses.module';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
@@ -26,7 +27,8 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     SalesModule,
     WishlistModule,
     FilesModule,
-    AuthModule
+    AuthModule,
+    AddressesModule
   ]
 })
 export class AppModule {}

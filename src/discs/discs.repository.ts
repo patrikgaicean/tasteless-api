@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import {Brackets, EntityRepository, Repository} from "typeorm";
+import { EntityRepository, Repository } from "typeorm";
 import PostgresErrorCode from "../database/postgresErrorCode.enum";
 import { Disc } from "./entities/disc.entity";
 
