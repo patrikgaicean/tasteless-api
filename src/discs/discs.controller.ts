@@ -47,9 +47,4 @@ export class DiscsController {
     return this.discsService.findOne(+id);
   }
 
-  @Post('mock-discs/:no')
-  async mockDiscs(@Param('no') no: string) {
-    return await this.discsService.mockDiscs(+no);
-  }
-
 }

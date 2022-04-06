@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { RankingsService } from './rankings.service';
 import { CreateRankingDto } from './dto/create-ranking.dto';
 import { UpdateRankingDto } from './dto/update-ranking.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('rankings')
+@ApiTags('rankings')
 export class RankingsController {
   constructor(private readonly rankingsService: RankingsService) {}
 

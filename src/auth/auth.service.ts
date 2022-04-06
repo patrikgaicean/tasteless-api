@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './interfaces/tokenPayload.interface';
 import { UsersRepository } from '../users/users.repository';
+import { Role } from '../users/dto/interfaces';
 
 @Injectable()
 export class AuthService {
@@ -13,8 +14,8 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService
   ) {}
- 
-  public async register(userData: RegisterDto) {
+
+  public async register(userData: RegisterDto, role: Role = Role.user) {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
     return await this.usersRepository.createUser({
@@ -22,7 +23,8 @@ export class AuthService {
       last_name: userData.lastName,
       display_name: userData.displayName,
       email: userData.email,
-      password: hashedPassword
+      password: hashedPassword,
+      role
     });
   }
 
@@ -55,5 +57,19 @@ export class AuthService {
 
   public getCookieForLogOut() {
     return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+  }
+
+  public async createAdminUser() {
+    if ((await this.usersRepository.findOne()) == undefined) {
+      const admin = {
+        firstName: 'tasteless',
+        lastName: 'admin',
+        displayName: 'tladmin',
+        email: this.configService.get('ADMIN_EMAIL'),
+        password: this.configService.get('ADMIN_PASSWORD'),
+      }
+
+      await this.register(admin, Role.admin);
+    }
   }
 }

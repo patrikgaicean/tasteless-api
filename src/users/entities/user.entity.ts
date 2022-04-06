@@ -3,6 +3,7 @@ import { Address } from "../../addresses/entities/address.entity";
 import { Notification } from "../../notifications/entities/notification.entity";
 import { Order } from "../../orders/entities/order.entity";
 import { Wishlist } from "../../wishlist/entities/wishlist.entity";
+import { Role } from "../dto/interfaces";
 
 @Entity('users')
 export class User {
@@ -23,6 +24,9 @@ export class User {
 
   @Column()
   password?: string;
+
+  @Column({ type: 'enum', enum: Role, default: Role.user })
+  role: Role;
 
   @OneToMany(() => Address, (address: Address) => address.owner)
   addresses?: Address[];
