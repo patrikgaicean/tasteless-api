@@ -14,6 +14,7 @@ import { TypeOrmConfigService } from './database/typeorm.service';
 import { AuthModule } from './auth/auth.module';
 import { AddressesModule } from './addresses/addresses.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { RankingsModule } from './rankings/rankings.module';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
@@ -30,7 +31,8 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     FilesModule,
     AuthModule,
     AddressesModule,
-    NotificationsModule
+    NotificationsModule,
+    RankingsModule
   ]
 })
 export class AppModule {}

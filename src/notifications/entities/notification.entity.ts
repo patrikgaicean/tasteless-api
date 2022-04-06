@@ -9,6 +9,9 @@ export class Notification {
   @Column()
   user_id: number;
 
+  @Column()
+  disc_id: number;
+
   @Column({ default: false })
   enabled: boolean;
 
