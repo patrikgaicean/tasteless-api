@@ -24,12 +24,15 @@ export class DiscsService {
   ) {}
 
   async mockDiscs(no: number) {
+    const bands = this.shuffle(bandNames);
+    const albums = this.shuffle(albumNames);
+
     const payloads = [];
     const totalAlbums = albumNames.length;
     let currentAlbum = 0;
     let totalProducts = 0;
 
-    bandNames.slice(0, no).forEach(band => {
+    bands.slice(0, no).forEach(band => {
       const albumNo = this.getRandomInt(1, 3);
       
       for (let i = 0; i < albumNo; i++) {
@@ -50,7 +53,7 @@ export class DiscsService {
         ]
 
         payloads.push({
-          title: albumNames[currentAlbum++],
+          title: albums[currentAlbum++],
           artist: band,
           releaseDate,
           genre: genreArray[Math.floor(Math.random() * genreArray.length)],
@@ -215,4 +218,21 @@ export class DiscsService {
     return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
   }
   
+  private shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (currentIndex != 0) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+  
+    return array;
+  }
 }

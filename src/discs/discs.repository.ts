@@ -9,9 +9,7 @@ export class DiscsRepository extends Repository<Disc> {
   async createDisc(data: Disc): Promise<Disc> {
     const existing: Disc = await this.findOne({
       title: data.title,
-      artist: data.artist,
-      release_date: data.release_date,
-      track_list: data.track_list
+      artist: data.artist
     })
 
     if (existing) {

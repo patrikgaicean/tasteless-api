@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Address } from "../../addresses/entities/address.entity";
+import { Notification } from "../../notifications/entities/notification.entity";
 import { Order } from "../../orders/entities/order.entity";
 import { Wishlist } from "../../wishlist/entities/wishlist.entity";
 
@@ -31,4 +32,7 @@ export class User {
 
   @OneToMany(() => Wishlist, (wishlist: Wishlist) => wishlist.owner)
   wishlist_items?: Wishlist[];
+
+  @OneToMany(() => Notification, (notification: Notification) => notification.owner)
+  notifications?: Notification[];
 }
