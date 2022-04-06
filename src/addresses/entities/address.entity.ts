@@ -8,6 +8,9 @@ export class Address {
   address_id?: number;
 
   @Column()
+  user_id: number;
+
+  @Column()
   first_name: string;
 
   @Column()
