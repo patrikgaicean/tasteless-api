@@ -43,7 +43,7 @@ export class WishlistService {
     return {
       wishlist_id: dto.wishlistId,
       user_id: dto.userId,
-      disc_id: dto.discId
+      disc_id: dto.discId,
     }
   }
 
@@ -51,7 +51,7 @@ export class WishlistService {
     return {
       wishlistId: entity.wishlist_id,
       userId: entity.user_id,
-      discId: entity.disc_id
+      discId: entity.disc_id,
     }
   }
 

@@ -27,5 +27,4 @@ export class WishlistRepository extends Repository<Wishlist> {
   async removeForUser(wishlist_id: number, user_id: number) {
     return await this.delete({ wishlist_id, user_id });
   }
-
 }
