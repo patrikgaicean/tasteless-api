@@ -23,6 +23,10 @@ export class DiscsService {
     private filesService: FilesService
   ) {}
 
+  async getCatalog() {
+    
+  }
+
   async mockDiscs(no: number) {
     const bands = this.shuffle(bandNames);
     const albums = this.shuffle(albumNames);

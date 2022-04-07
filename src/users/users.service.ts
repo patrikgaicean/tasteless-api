@@ -27,7 +27,8 @@ export class UsersService {
       firstName: entity.first_name,
       lastName: entity.last_name,
       displayName: entity.display_name,
-      email: entity.email
+      email: entity.email,
+      role: entity.role
     }
   }
 }
