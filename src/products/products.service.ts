@@ -49,6 +49,11 @@ export class ProductsService {
     return entities.map(e => this.toDto(e));
   }
 
+  async findById(productId: number) {
+    const entity: Product = await this.productsRepository.findById(productId);
+
+    return this.toDto(entity);
+  }
 
   toEntity(dto: ProductDto): Product {
     return {

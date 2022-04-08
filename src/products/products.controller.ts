@@ -40,4 +40,9 @@ export class ProductsController {
   async findAllByDiscId(@Param('discId') discId: string) {
     return this.productsService.findAllByDiscId(+discId);
   }
+
+  @Get(':id/details')
+  async findById(@Param('id') id: string) {
+    return this.productsService.findById(+id);
+  }
 }
