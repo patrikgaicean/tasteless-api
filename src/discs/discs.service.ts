@@ -23,6 +23,10 @@ export class DiscsService {
     private filesService: FilesService
   ) {}
 
+  async getCatalog() {
+    
+  }
+
   async mockDiscs(no: number) {
     const bands = this.shuffle(bandNames);
     const albums = this.shuffle(albumNames);
@@ -159,7 +163,7 @@ export class DiscsService {
   async findOne(discId: number, details: boolean = true) {
     const entity: Disc = await this.discsRepository.findById(discId);
     const images = await this.getDiscImages(entity.disc_id);
-    const lowestPrice = await this.productsRepository.findLowestPrice(entity.disc_id);
+    const { lowestPrice, productId } = await this.productsRepository.findLowestPrice(entity.disc_id);
 
     let disc = {}
     if (details) {
@@ -175,7 +179,8 @@ export class DiscsService {
     return {
       ...disc,
       images: images.map(img => ({ url: img.url, main: img.main})),
-      lowestPrice
+      lowestPrice,
+      productId
     }
   }
 

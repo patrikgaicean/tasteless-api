@@ -31,13 +31,25 @@ export class ProductsRepository extends Repository<Product> {
     return entity;
   }
 
-  async findLowestPrice(disc_id: number): Promise<number> {
-    const { lowestPrice } = await this.createQueryBuilder('products')
+  async findLowestPrice(disc_id: number): Promise<any> {
+    const resp = await this.createQueryBuilder('products')
       .select('MIN(products.price)', 'lowestPrice')
+      .addSelect('product_id', 'product_id')
       .where('products.disc_id = :id', { id: disc_id })
+      .groupBy('product_id')
       .getRawOne();
 
-    return lowestPrice;
+    if (!resp) {
+      return {
+        lowestPrice: null,
+        productId: null
+      }
+    }
+
+    return {
+      lowestPrice: resp.lowestPrice,
+      productId: resp.product_id
+    }
   }
 
 }

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
@@ -27,7 +27,8 @@ export class UsersService {
       firstName: entity.first_name,
       lastName: entity.last_name,
       displayName: entity.display_name,
-      email: entity.email
+      email: entity.email,
+      role: entity.role
     }
   }
 }
