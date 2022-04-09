@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import {EntityRepository, Repository} from "typeorm";
+import {EntityRepository, In, QueryRunner, Repository} from "typeorm";
 import { Product } from "./entities/product.entity";
 
 @EntityRepository(Product)
@@ -18,11 +18,11 @@ export class ProductsRepository extends Repository<Product> {
   }
 
   async findAllByDiscId(disc_id: number): Promise<Product[]> {
-    return await this.find({ disc_id });
+    return await this.find({ disc_id, deleted: false });
   }
 
   async findById(product_id: number): Promise<Product> {
-    const entity: Product = await this.findOne({ product_id })
+    const entity: Product = await this.findOne({ product_id, deleted: false })
 
     if (!entity) {
       throw new HttpException(`Product with id ${product_id} not found`, 404);
@@ -49,6 +49,27 @@ export class ProductsRepository extends Repository<Product> {
     return {
       lowestPrice: resp.lowestPrice,
       productId: resp.product_id
+    }
+  }
+
+  async deleteProductsBulk(data: number[], queryRunner?: QueryRunner): Promise<any> {
+    try {
+      if (queryRunner) {
+        await queryRunner.manager
+          .createQueryBuilder()
+          .update(Product)
+          .set({ deleted: true })
+          .where({ product_id: In(data) })
+          .execute();
+      } else {
+        await this.createQueryBuilder()
+          .update(Product)
+          .set({ deleted: true })
+          .where({ product_id: In(data) })
+          .execute();
+      }
+    } catch (error) {
+      throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

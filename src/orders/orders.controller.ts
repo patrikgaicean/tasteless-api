@@ -13,6 +13,7 @@ export class OrdersController {
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Req() req: RequestWithUserDto, @Body() createOrderDto: CreateOrderDto) {
+    console.log('oiiiii fml')
     return this.ordersService.create(createOrderDto, req.user.userId);
   }
 
