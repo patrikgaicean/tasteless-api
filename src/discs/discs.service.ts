@@ -143,6 +143,7 @@ export class DiscsService {
     return Promise.all(
       entities.map(async (e) => {
         const dto = this.toDto(e);
+        const { lowestPrice, productId } = await this.productsRepository.findLowestPrice(e.disc_id)
 
         return {
           discId: dto.discId, 
@@ -154,7 +155,8 @@ export class DiscsService {
               main: img.main
             }
           }),
-          lowestPrice: await this.productsRepository.findLowestPrice(e.disc_id)
+          lowestPrice,
+          productId
         }
       })
     )

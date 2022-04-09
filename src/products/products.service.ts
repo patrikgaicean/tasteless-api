@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { QueryRunner } from 'typeorm';
 import { FilesService } from '../files/files.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductDto } from './dto/product.dto';
@@ -53,6 +54,13 @@ export class ProductsService {
     const entity: Product = await this.productsRepository.findById(productId);
 
     return this.toDto(entity);
+  }
+
+  async deleteBulk(data: number[], queryRunner?: QueryRunner): Promise<any> {
+    return await this.productsRepository.deleteProductsBulk(
+      data,
+      queryRunner
+    );
   }
 
   toEntity(dto: ProductDto): Product {

@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Connection } from 'typeorm';
 import { ProductDto } from '../products/dto/product.dto';
+import { ProductsService } from '../products/products.service';
 import { SalesService } from '../sales/sales.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderDto } from './dto/order.dto';
@@ -12,6 +13,7 @@ export class OrdersService {
   constructor(
     private ordersRepository: OrdersRepository,
     private salesService: SalesService,
+    private productsService: ProductsService,
     private connection: Connection
   ) {}
 
@@ -32,6 +34,8 @@ export class OrdersService {
         productIds.map(p => ({ productId: p, orderId: entity.order_id })),
         queryRunner
       );
+
+      await this.productsService.deleteBulk(productIds, queryRunner);
   
       await queryRunner.commitTransaction();
 

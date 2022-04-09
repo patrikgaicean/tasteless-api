@@ -49,6 +49,6 @@ export class Order {
   owner?: User;
 
   @ManyToOne(() => Address, (address: Address) => address.orders)
-  @JoinColumn({ name: 'disc_id' })
+  @JoinColumn({ name: 'address_id' })
   address?: Address;
 }
