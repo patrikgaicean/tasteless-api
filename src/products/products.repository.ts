@@ -37,6 +37,7 @@ export class ProductsRepository extends Repository<Product> {
       .addSelect('product_id', 'product_id')
       .where('products.disc_id = :id', { id: disc_id })
       .groupBy('product_id')
+      .orderBy('MIN(products.price)', 'ASC')
       .getRawOne();
 
     if (!resp) {

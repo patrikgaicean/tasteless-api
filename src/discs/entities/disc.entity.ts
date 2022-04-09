@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { DiscImage } from "../../files/entities/disc-image.entity";
 import { Product } from "../../products/entities/product.entity";
+import { Ranking } from "../../rankings/entities/ranking.entity";
 import { Genre } from "../dto/interfaces";
 
 @Entity('discs')
@@ -34,4 +35,7 @@ export class Disc {
 
   @OneToMany(() => DiscImage, (disc: DiscImage) => disc.owner)
   images?: DiscImage[];
+
+  @OneToMany(() => Ranking, (ranking: Ranking) => ranking.disc)
+  rankings?: Ranking[];
 }

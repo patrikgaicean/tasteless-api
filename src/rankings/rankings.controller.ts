@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common';
 import { RankingsService } from './rankings.service';
 import { CreateRankingDto } from './dto/create-ranking.dto';
-import { UpdateRankingDto } from './dto/update-ranking.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt.auth.guard';
+import { RequestWithUserDto } from '../auth/interfaces/requestWithUser.interface';
 
 @Controller('rankings')
 @ApiTags('rankings')
@@ -10,27 +11,15 @@ export class RankingsController {
   constructor(private readonly rankingsService: RankingsService) {}
 
   @Post()
-  create(@Body() createRankingDto: CreateRankingDto) {
-    return this.rankingsService.create(createRankingDto);
+  @UseGuards(JwtAuthGuard)
+  create(@Req() req: RequestWithUserDto, @Body() createRankingDto: CreateRankingDto) {
+    return this.rankingsService.create(createRankingDto, req.user.userId);
   }
 
   @Get()
-  findAll() {
-    return this.rankingsService.findAll();
+  @UseGuards(JwtAuthGuard)
+  findAllForUser(@Req() req: RequestWithUserDto) {
+    return this.rankingsService.findAllForUser(req.user.userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rankingsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRankingDto: UpdateRankingDto) {
-    return this.rankingsService.update(+id, updateRankingDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rankingsService.remove(+id);
-  }
 }

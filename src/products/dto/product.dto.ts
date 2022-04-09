@@ -6,4 +6,5 @@ export class ProductDto {
   condition: Condition;
   price: number;
   deleted?: boolean;
+  added?: string;
 }
