@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 
 @Entity('notifications')
+@Unique('user_notification', ['user_id', 'disc_id'])
 export class Notification {
   @PrimaryGeneratedColumn()
   notification_id?: number;

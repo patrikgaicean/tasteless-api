@@ -173,6 +173,7 @@ export class DiscsService {
     const entity: Disc = await this.discsRepository.findById(discId);
     const images = await this.getDiscImages(entity.disc_id);
     const { lowestPrice, productId } = await this.productsRepository.findLowestPrice(entity.disc_id);
+    const ranking = await this.rankingsRepository.findDiscAverageRanking(entity.disc_id);
 
     let disc = {}
     if (details) {
@@ -189,7 +190,8 @@ export class DiscsService {
       ...disc,
       images: images.map(img => ({ url: img.url, main: img.main})),
       lowestPrice,
-      productId
+      productId,
+      ranking
     }
   }
 

@@ -30,6 +30,16 @@ export class RankingsRepository extends Repository<Ranking> {
       .getMany();
   }
 
+  async findOneForUser(user_id: number, disc_id: number): Promise<Ranking> {
+    const entity = await this.findOne({ user_id, disc_id });
+
+    if (!entity) {
+      return;
+    }
+
+    return entity;
+  }
+
   async findDiscAverageRanking(disc_id: number): Promise<any> {
     const { averageRank } = await this.createQueryBuilder('rankings')
       .select('AVG(rankings.rank)', 'averageRank')

@@ -21,6 +21,12 @@ export class WishlistController {
   findAllForUser(@Req() req: RequestWithUserDto) {
     return this.wishlistService.findAllForUser(req.user.userId);
   }
+  
+  @Get(':discId')
+  @UseGuards(JwtAuthGuard)
+  findByDiscId(@Req() req: RequestWithUserDto, @Param('discId') discId: string) {
+    return this.wishlistService.findByDiscId(+discId, req.user.userId);
+  }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)

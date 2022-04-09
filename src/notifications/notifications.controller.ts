@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt.auth.guard';
+import { RequestWithUserDto } from '../auth/interfaces/requestWithUser.interface';
 
 @Controller('notifications')
 @ApiTags('notifications')
@@ -10,27 +11,21 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
-  create(@Body() createNotificationDto: CreateNotificationDto) {
-    return this.notificationsService.create(createNotificationDto);
+  @UseGuards(JwtAuthGuard)
+  create(@Req() req: RequestWithUserDto, @Body() createNotificationDto: CreateNotificationDto) {
+    return this.notificationsService.create(createNotificationDto, req.user.userId);
   }
 
-  @Get()
-  findAll() {
-    return this.notificationsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.notificationsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNotificationDto: UpdateNotificationDto) {
-    return this.notificationsService.update(+id, updateNotificationDto);
+  @Get(':discId')
+  @UseGuards(JwtAuthGuard)
+  findByDiscId(@Req() req: RequestWithUserDto, @Param('discId') discId: string) {
+    return this.notificationsService.findByDiscId(+discId, req.user.userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.notificationsService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  remove(@Req() req: RequestWithUserDto, @Param('id') id: string) {
+    return this.notificationsService.removeForUser(+id, req.user.userId);
   }
+
 }
