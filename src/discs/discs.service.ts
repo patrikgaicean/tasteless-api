@@ -13,6 +13,8 @@ import { genreArray } from './dto/interfaces';
 import { ProductsService } from '../products/products.service';
 import { CreateProductDto } from '../products/dto/create-product.dto';
 import { conditionArray } from '../products/dto/interfaces';
+import { DiscQuery } from './dto/query';
+import { RankingsRepository } from '../rankings/rankings.repository';
 
 @Injectable()
 export class DiscsService {
@@ -20,7 +22,8 @@ export class DiscsService {
     private discsRepository: DiscsRepository,
     private productsRepository: ProductsRepository,
     private productsService: ProductsService,
-    private filesService: FilesService
+    private filesService: FilesService,
+    private rankingsRepository: RankingsRepository
   ) {}
 
   async getCatalog() {
@@ -30,11 +33,13 @@ export class DiscsService {
   async mockDiscs(no: number) {
     const bands = this.shuffle(bandNames);
     const albums = this.shuffle(albumNames);
-
+    
     const payloads = [];
     const totalAlbums = albumNames.length;
     let currentAlbum = 0;
     let totalProducts = 0;
+
+    console.log(no);
 
     bands.slice(0, no).forEach(band => {
       const albumNo = this.getRandomInt(1, 3);
@@ -137,13 +142,14 @@ export class DiscsService {
     throw new NotFoundException('User with this id does not exist');
   }
 
-  async findAll() {
-    const entities: Disc[] = await this.discsRepository.findAll();
+  async findAll(query: DiscQuery) {
+    const entities: Disc[] = await this.discsRepository.findAll(query);
 
     return Promise.all(
       entities.map(async (e) => {
         const dto = this.toDto(e);
-        const { lowestPrice, productId } = await this.productsRepository.findLowestPrice(e.disc_id)
+        const { lowestPrice, productId } = await this.productsRepository.findLowestPrice(e.disc_id);
+        const ranking = await this.rankingsRepository.findDiscAverageRanking(e.disc_id);
 
         return {
           discId: dto.discId, 
@@ -156,7 +162,8 @@ export class DiscsService {
             }
           }),
           lowestPrice,
-          productId
+          productId,
+          ranking
         }
       })
     )
@@ -184,6 +191,10 @@ export class DiscsService {
       lowestPrice,
       productId
     }
+  }
+
+  async getGenres() {
+    return await this.discsRepository.getGenres();
   }
 
   toEntity(dto: DiscDto): Disc {

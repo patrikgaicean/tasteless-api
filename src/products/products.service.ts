@@ -68,7 +68,7 @@ export class ProductsService {
       product_id: dto.productId,
       disc_id: dto.discId,
       condition: dto.condition,
-      price: dto.price
+      price: dto.price,
     }
   }
 
@@ -78,6 +78,7 @@ export class ProductsService {
       discId: entity.disc_id,
       condition: entity.condition,
       price: entity.price,
+      added: `${entity.added}`
     }
   }
 }

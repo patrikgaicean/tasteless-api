@@ -23,6 +23,9 @@ export class Product {
   @Column({ default: false })
   deleted?: boolean;
 
+  @Column({ type: 'timestamptz', default: () => "CURRENT_TIMESTAMP" })
+  added?: Date;
+
   @ManyToOne(() => Disc, (disc: Disc) => disc.products)
   @JoinColumn({ name: 'disc_id' })
   disc?: Disc;
