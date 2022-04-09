@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get, Param } from '@nestjs/common';
 import { RankingsService } from './rankings.service';
 import { CreateRankingDto } from './dto/create-ranking.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -20,6 +20,12 @@ export class RankingsController {
   @UseGuards(JwtAuthGuard)
   findAllForUser(@Req() req: RequestWithUserDto) {
     return this.rankingsService.findAllForUser(req.user.userId);
+  }
+
+  @Get(':discId')
+  @UseGuards(JwtAuthGuard)
+  findOneForUser(@Req() req: RequestWithUserDto, @Param('discId') discId: string) {
+    return this.rankingsService.findOneForUser(req.user.userId, +discId);
   }
 
 }

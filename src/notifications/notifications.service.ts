@@ -1,26 +1,54 @@
 import { Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { NotificationDto } from './dto/notification.dto';
+import { Notification } from './entities/notification.entity';
+import { NotificationsRepository } from './notifications.repository';
 
 @Injectable()
 export class NotificationsService {
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
+
+  constructor(
+    private notificationsRepository: NotificationsRepository
+  ) {}
+
+  async create(createNotificationDto: CreateNotificationDto, userId: number) {
+    const entity: Notification = await this.notificationsRepository.createNotification(
+      this.toEntity({ userId, enabled: true, ...createNotificationDto })
+    );
+
+    return this.toDto(entity);
   }
 
-  findAll() {
-    return `This action returns all notifications`;
+  async findByDiscId(discId: number, userId: number) {
+    const entity: Notification = await this.notificationsRepository.findByDiscId(discId, userId);
+
+    if (!entity) {
+      return;
+    }
+
+    return this.toDto(entity);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
+  async removeForUser(id: number, userId: number) {
+    return await this.notificationsRepository.removeForUser(id, userId);
   }
 
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
+  toEntity(dto: NotificationDto): Notification {
+    return {
+      notification_id: dto.notificationId,
+      user_id: dto.userId,
+      disc_id: dto.discId,
+      enabled: dto.enabled
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+  toDto(entity: Notification): NotificationDto {
+    return {
+      notificationId: entity.notification_id,
+      userId: entity.user_id,
+      discId: entity.disc_id,
+      enabled: entity.enabled
+    }
   }
+
 }

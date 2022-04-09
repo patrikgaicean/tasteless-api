@@ -35,6 +35,16 @@ export class WishlistService {
     )
   }
 
+  async findByDiscId(discId: number, userId: number) {
+    const entity: Wishlist = await this.wishlistRepository.findByDiscId(discId, userId);
+
+    if (!entity) {
+      return;
+    }
+
+    return this.toDto(entity);
+  }
+
   async removeForUser(id: number, userId: number) {
     return await this.wishlistRepository.removeForUser(id, userId);
   }

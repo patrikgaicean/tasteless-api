@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
-import {EntityRepository, QueryRunner, Repository} from "typeorm";
+import {EntityRepository, Repository} from "typeorm";
 import { Wishlist } from "./entities/wishlist.entity";
 
 @EntityRepository(Wishlist)
 export class WishlistRepository extends Repository<Wishlist> {
 
-  async createWishlistItem(data: Wishlist, queryRunner?: QueryRunner): Promise<Wishlist> {
+  async createWishlistItem(data: Wishlist): Promise<Wishlist> {
     const entity: Wishlist = this.create(data);
 
     try {
@@ -22,6 +22,16 @@ export class WishlistRepository extends Repository<Wishlist> {
       .leftJoinAndSelect(`wishlist.disc`, `disc`)
       .where(`user_id = :id`, { id: user_id })
       .getMany();
+  }
+
+  async findByDiscId(disc_id: number, user_id: number): Promise<Wishlist> {
+    const entity = await this.findOne({ disc_id, user_id });
+
+    if (!entity) {
+      return;
+    }
+
+    return entity;
   }
 
   async removeForUser(wishlist_id: number, user_id: number) {

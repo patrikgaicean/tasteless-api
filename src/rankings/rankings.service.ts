@@ -26,6 +26,10 @@ export class RankingsService {
     return entities.map(e => this.toDto(e));
   }
 
+  async findOneForUser(userId: number, discId: number) {
+    return await this.rankingsRepository.findOneForUser(userId, discId);
+  }
+
   async mockRankings(userId: number) {
     const discs = await this.discsService.findAll({} as any);
 
