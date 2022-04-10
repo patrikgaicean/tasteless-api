@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { QueryRunner } from 'typeorm';
+import { EmailService } from '../email/email.service';
 import { FilesService } from '../files/files.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { UsersService } from '../users/users.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductDto } from './dto/product.dto';
 import { Product } from './entities/product.entity';
@@ -10,11 +13,39 @@ import { ProductsRepository } from './products.repository';
 export class ProductsService {
   constructor(
     private productsRepository: ProductsRepository,
-    private filesService: FilesService
+    private filesService: FilesService,
+    private notificationsService: NotificationsService,
+    private emailService: EmailService,
+    private userService: UsersService
   ) {}
 
   async create(data: CreateProductDto) {
     const entity: Product = await this.productsRepository.createProduct(this.toEntity(data));
+
+    const notifications = await this.notificationsService.findByDiscId(data.discId);
+
+    await Promise.all(
+      notifications.map(async (n) => {
+        const { email, displayName } = await this.userService.findById(n.userId);
+
+        await this.emailService.sendMail({
+          from: 'tastelessrecords@zohomail.eu',
+          to: 'patrikgaicean07@gmail.com', // TODO change this to email
+          subject: `${n.discArtist} - ${n.discTitle} - Back in Stock!`,
+          html: `
+            <p style="padding:0;margin:0 0 10px 0">Hello ${displayName},</p>
+            <p style="padding:0;margin:0 0 10px 0">"${n.discArtist} - ${n.discTitle}" is back in stock!</p>
+            <p style="padding:0;margin:0 0 0px 0">
+            Best Regards,
+            <br>
+            Your Tasteless Records team
+            </p>
+          `
+        })
+
+        await this.notificationsService.removeForUser(n.notificationId, n.userId);
+      })
+    )
 
     return this.toDto(entity);
   }
