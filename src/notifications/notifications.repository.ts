@@ -21,7 +21,7 @@ export class NotificationsRepository extends Repository<Notification> {
     return entity;
   }
 
-  async findByDiscId(disc_id: number, user_id: number): Promise<Notification> {
+  async findByUserAndDiscId(disc_id: number, user_id: number): Promise<Notification> {
     const entity = await this.findOne({ disc_id, user_id });
 
     if (!entity) {
@@ -29,6 +29,10 @@ export class NotificationsRepository extends Repository<Notification> {
     }
 
     return entity;
+  }
+
+  async findByDiscId(disc_id: number): Promise<Notification[]> {
+    return await this.find({ where: { disc_id }, relations: ['disc' ]});
   }
 
   async removeForUser(notification_id: number, user_id: number) {

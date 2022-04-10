@@ -46,6 +46,24 @@ class EnvironmentVariables {
 
   @IsString()
   AWS_PRIVATE_BUCKET_NAME: string;
+
+  @IsString()
+  EMAIL_SERVICE: string;
+
+  @IsString()
+  EMAIL_USER: string;
+
+  @IsString()
+  EMAIL_PASSWORD: string;
+
+  @IsString()
+  OAUTH_CLIENTID: string;
+
+  @IsString()
+  OAUTH_CLIENT_SECRET: string;
+
+  @IsString()
+  OAUTH_REFRESH_TOKEN: string;
 }
 
 export function validate(config: Record<string, unknown>) {

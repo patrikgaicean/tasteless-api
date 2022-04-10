@@ -16,6 +16,7 @@ import { AddressesModule } from './addresses/addresses.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { RankingsModule } from './rankings/rankings.module';
 import { UtilitiesModule } from './utilities/utilities.module';
+import { EmailModule } from './email/email.module';
 
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 
@@ -34,7 +35,8 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     AddressesModule,
     NotificationsModule,
     RankingsModule,
-    UtilitiesModule
+    UtilitiesModule,
+    EmailModule
   ]
 })
 export class AppModule {}

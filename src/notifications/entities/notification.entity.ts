@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Disc } from "../../discs/entities/disc.entity";
 import { User } from "../../users/entities/user.entity";
 
 @Entity('notifications')
@@ -19,4 +20,8 @@ export class Notification {
   @ManyToOne(() => User, (owner: User) => owner.notifications)
   @JoinColumn({ name: 'user_id' })
   owner?: User;
+
+  @ManyToOne(() => Disc, (disc: Disc) => disc.notifications)
+  @JoinColumn({ name: 'disc_id' })
+  disc?: Disc;
 }

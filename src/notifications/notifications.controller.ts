@@ -18,8 +18,8 @@ export class NotificationsController {
 
   @Get(':discId')
   @UseGuards(JwtAuthGuard)
-  findByDiscId(@Req() req: RequestWithUserDto, @Param('discId') discId: string) {
-    return this.notificationsService.findByDiscId(+discId, req.user.userId);
+  findByUserAndDiscId(@Req() req: RequestWithUserDto, @Param('discId') discId: string) {
+    return this.notificationsService.findByUserAndDiscId(+discId, req.user.userId);
   }
 
   @Delete(':id')

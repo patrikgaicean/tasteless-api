@@ -7,7 +7,7 @@ export class CreateProductDto {
   @IsNumber()
   discId: number;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Condition })
   @IsEnum(Condition)
   condition: Condition;
 

@@ -19,14 +19,26 @@ export class NotificationsService {
     return this.toDto(entity);
   }
 
-  async findByDiscId(discId: number, userId: number) {
-    const entity: Notification = await this.notificationsRepository.findByDiscId(discId, userId);
+  async findByUserAndDiscId(discId: number, userId: number) {
+    const entity: Notification = await this.notificationsRepository.findByUserAndDiscId(discId, userId);
 
     if (!entity) {
       return;
     }
 
     return this.toDto(entity);
+  }
+
+  async findByDiscId(discId: number) {
+    const entities: Notification[] = await this.notificationsRepository.findByDiscId(discId);
+    
+    return entities.map(e => {
+      return {
+        ...this.toDto(e),
+        discTitle: e.disc.title,
+        discArtist: e.disc.artist
+      }
+    });
   }
 
   async removeForUser(id: number, userId: number) {

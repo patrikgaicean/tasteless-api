@@ -1,8 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { DiscImage } from "../../files/entities/disc-image.entity";
 import { Product } from "../../products/entities/product.entity";
 import { Ranking } from "../../rankings/entities/ranking.entity";
 import { Genre } from "../dto/interfaces";
+import { Notification } from "../../notifications/entities/notification.entity";
 
 @Entity('discs')
 export class Disc {
@@ -38,4 +39,7 @@ export class Disc {
 
   @OneToMany(() => Ranking, (ranking: Ranking) => ranking.disc)
   rankings?: Ranking[];
+
+  @OneToMany(() => Notification, (notification: Notification) => notification.disc)
+  notifications?: Notification[];
 }

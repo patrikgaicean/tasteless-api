@@ -8,6 +8,6 @@ import { NotificationsRepository } from './notifications.repository';
   imports: [TypeOrmModule.forFeature([NotificationsRepository])],
   controllers: [NotificationsController],
   providers: [NotificationsService],
-  exports: []
+  exports: [NotificationsService]
 })
 export class NotificationsModule {}
