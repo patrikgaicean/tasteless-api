@@ -28,20 +28,24 @@ export class ProductsService {
       notifications.map(async (n) => {
         const { email, displayName } = await this.userService.findById(n.userId);
 
-        await this.emailService.sendMail({
-          from: 'tastelessrecords@zohomail.eu',
-          to: 'patrikgaicean07@gmail.com', // TODO change this to email
-          subject: `${n.discArtist} - ${n.discTitle} - Back in Stock!`,
-          html: `
-            <p style="padding:0;margin:0 0 10px 0">Hello ${displayName},</p>
-            <p style="padding:0;margin:0 0 10px 0">"${n.discArtist} - ${n.discTitle}" is back in stock!</p>
-            <p style="padding:0;margin:0 0 0px 0">
-            Best Regards,
-            <br>
-            Your Tasteless Records team
-            </p>
-          `
-        })
+        try {
+          await this.emailService.sendMail({
+            from: 'tastelessrecordsapp@gmail.com',
+            to: email,
+            subject: `${n.discArtist} - ${n.discTitle} - Back in Stock!`,
+            html: `
+              <p style="padding:0;margin:0 0 10px 0">Hello ${displayName},</p>
+              <p style="padding:0;margin:0 0 10px 0">"${n.discArtist} - ${n.discTitle}" is back in stock!</p>
+              <p style="padding:0;margin:0 0 0px 0">
+              Best Regards,
+              <br>
+              Your Tasteless Records team
+              </p>
+            `
+          })
+        } catch (err) {
+          console.error(err); // invalid emails or whatever
+        }
 
         await this.notificationsService.removeForUser(n.notificationId, n.userId);
       })
