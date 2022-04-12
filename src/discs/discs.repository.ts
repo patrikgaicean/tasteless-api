@@ -32,32 +32,41 @@ export class DiscsRepository extends Repository<Disc> {
   }
 
   async findAll(query: DiscQuery): Promise<Disc[]> {
+    let queried = false; // only accept one query at a time
+
     const q = this.createQueryBuilder('disc')
       .leftJoinAndSelect('disc.images', 'images')
       .where(new Brackets(qb => {
         if (query.selectedGenre) {
           qb.andWhere('disc.genre = :genre', { genre: query.selectedGenre })
+          queried = true;
+        } else if (query.artist && !queried) {
+          qb.andWhere('LOWER(disc.artist) LIKE :artist', { artist: `%${query.artist}%` })
+          queried = true;
         }
       }))
 
-    if (query.newInStock === true && !query.selectedGenre) {
+    if (query.newInStock === true && !queried) {
       q.leftJoinAndSelect('disc.products', 'product')
         .where('product.deleted = false')
         .orderBy('product.added', 'DESC')
         .limit(20)
+      queried = true;
     }
 
-    else if (query.top100 === true && !query.selectedGenre) {
+    else if (query.top100 === true && !queried) {
       q.leftJoinAndSelect('disc.rankings', 'ranking')
         .orderBy('ranking.rank', 'DESC')
         .limit(100)
+      queried = true;
     }
 
-    else if (query.sale === true && !query.selectedGenre) {
+    else if (query.sale === true && !queried) {
       q.leftJoinAndSelect('disc.products', 'product')
         .where('product.deleted = false')
         .orderBy('product.price', 'ASC')
         .limit(20)
+      queried = true;
     }
 
     return await q.getMany();

@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsBoolean, IsEnum, IsOptional } from "class-validator";
+import { IsBoolean, IsEnum, IsOptional, IsString } from "class-validator";
 import { ToBoolean } from "../../common/transforms/to-boolean";
 import { Genre } from "./interfaces"
 
@@ -26,4 +26,9 @@ export class DiscQuery {
   @ToBoolean()
   @IsBoolean()
   newInStock: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  artist: string;
 }
