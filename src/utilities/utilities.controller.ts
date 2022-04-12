@@ -31,11 +31,11 @@ export class UtilitiesController {
   async getCatalog(@Res() res: Response) {
     const file = await this.utilitiesService.getCatalog();
 
-    // res.set({
-    //   'Content-Type': 'application/json',
-    //   'Content-Disposition': 'attachment; filename="package.json"',
-    // });
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="tasteless-records-catalog.xls"',
+    });
 
-    // file.pipe(res);
+    file.write(`tasteless-records-catalog.xlsx`, res)
   }
 }
