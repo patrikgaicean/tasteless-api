@@ -15,6 +15,7 @@ import { CreateProductDto } from '../products/dto/create-product.dto';
 import { conditionArray } from '../products/dto/interfaces';
 import { DiscQuery } from './dto/query';
 import { RankingsRepository } from '../rankings/rankings.repository';
+import * as xl from 'excel4node';
 
 @Injectable()
 export class DiscsService {
@@ -27,7 +28,70 @@ export class DiscsService {
   ) {}
 
   async getCatalog() {
-    
+    const wb = new xl.Workbook();
+    const ws = wb.addWorksheet('Catalog');
+
+    ws.column(2).setWidth(30);
+    ws.column(3).setWidth(30);
+    ws.column(4).setWidth(15);
+    ws.column(7).setWidth(15);
+    ws.row(1).setHeight(20);
+
+    const headingColumnNames = [
+      "Disc Id",
+      "Title",
+      "Artist",
+      "Release Date",
+      "Genre",
+      "Product Id",
+      "Condition",
+      "Price"
+    ]
+
+    const discsWithProducts = await this.discsRepository.findAllWithProduct();
+
+    let headingColumnIndex = 1;
+      headingColumnNames.forEach(heading => {
+        ws.cell(1, headingColumnIndex++)
+          .string(heading)
+    });
+
+    let rowIndex = 2;
+    discsWithProducts.forEach(disc => {
+      let columnIndex = 1;
+
+      Object.keys(disc).forEach(columnName => {
+        const val = disc[columnName];
+
+        if (columnName === 'disc_id') {
+          ws.cell(rowIndex, columnIndex++)
+            .number(val)
+        } else {
+          ws.cell(rowIndex, columnIndex++)
+            .string(val)
+        }
+      });
+
+      disc.products.forEach(product => {
+        columnIndex = 6
+
+        Object.keys(product).forEach(columnName => {
+          const val = product[columnName];
+
+          if (columnName === 'product_id' || columnName === 'price') {
+            ws.cell(rowIndex, columnIndex++)
+              .number(val)
+          } else {
+            ws.cell(rowIndex, columnIndex++)
+              .string(val)
+          }
+        });
+
+        rowIndex++;
+      })
+    });
+
+    return wb;
   }
 
   async mockDiscs(no: number) {
@@ -39,9 +103,7 @@ export class DiscsService {
     let currentAlbum = 0;
     let totalProducts = 0;
 
-    console.log(no);
-
-    bands.slice(0, no).forEach(band => {
+    bands.slice(0, no).forEach((band: string) => {
       const albumNo = this.getRandomInt(1, 3);
       
       for (let i = 0; i < albumNo; i++) {

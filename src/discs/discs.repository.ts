@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Brackets, EntityRepository, Repository } from "typeorm";
 import PostgresErrorCode from "../database/postgresErrorCode.enum";
-import { DiscImage } from "../files/entities/disc-image.entity";
 import { DiscQuery } from "./dto/query";
 import { Disc } from "./entities/disc.entity";
 
@@ -41,25 +40,44 @@ export class DiscsRepository extends Repository<Disc> {
         }
       }))
 
-    if (query.newInStock === true) {
+    if (query.newInStock === true && !query.selectedGenre) {
       q.leftJoinAndSelect('disc.products', 'product')
+        .where('product.deleted = false')
         .orderBy('product.added', 'DESC')
         .limit(20)
     }
 
-    if (query.top100 === true) {
+    else if (query.top100 === true && !query.selectedGenre) {
       q.leftJoinAndSelect('disc.rankings', 'ranking')
         .orderBy('ranking.rank', 'DESC')
         .limit(100)
     }
 
-    if (query.sale === true) {
+    else if (query.sale === true && !query.selectedGenre) {
       q.leftJoinAndSelect('disc.products', 'product')
+        .where('product.deleted = false')
         .orderBy('product.price', 'ASC')
         .limit(20)
     }
 
-    return q.getMany();
+    return await q.getMany();
+  }
+
+  async findAllWithProduct(): Promise<Disc[]> {
+    return this.createQueryBuilder('disc')
+      .leftJoinAndSelect('disc.products', 'product')
+      .where('product.deleted = false')
+      .select([
+        'disc.disc_id',
+        'disc.title',
+        'disc.artist',
+        'disc.release_date',
+        'disc.genre',
+        'product.product_id',
+        'product.condition',
+        'product.price'
+      ])
+      .getMany();
   }
 
   async findById(disc_id: number): Promise<Disc> {

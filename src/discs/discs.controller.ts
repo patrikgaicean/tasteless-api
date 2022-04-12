@@ -6,7 +6,6 @@ import { DiscsService } from './discs.service';
 import { CreateDiscDto } from './dto/create-disc.dto';
 import { FilesUploadDto } from '../files/dto/file-upload.dto';
 import { DiscQuery } from './dto/query';
-import { Genre } from './dto/interfaces';
 
 @Controller('discs')
 @ApiTags('discs')
