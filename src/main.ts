@@ -35,7 +35,7 @@ async function bootstrap() {
   }
 
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, swaggerDocument, swaggerOptions);
+  SwaggerModule.setup('docs', app, swaggerDocument, swaggerOptions);
 
   awsConfig.update({
     accessKeyId: config.get<string>('AWS_ACCESS_KEY_ID'),
@@ -46,7 +46,7 @@ async function bootstrap() {
   await app.listen(port, () => {
     // TODO use nest logger
     console.log('[API]', `http://localhost:${config.get<string>('PORT')}`);
-    console.log('[DOCS]', `http://localhost:${config.get<string>('PORT')}/api`);
+    console.log('[DOCS]', `http://localhost:${config.get<string>('PORT')}/docs`);
   });
 }
 

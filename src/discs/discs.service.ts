@@ -207,7 +207,7 @@ export class DiscsService {
   async findAll(query: DiscQuery) {
     const entities: Disc[] = await this.discsRepository.findAll(query);
 
-    return Promise.all(
+    const discs = await Promise.all(
       entities.map(async (e) => {
         const dto = this.toDto(e);
         const { lowestPrice, productId } = await this.productsRepository.findLowestPrice(e.disc_id);
@@ -229,6 +229,14 @@ export class DiscsService {
         }
       })
     )
+
+    if (query.top100) {
+      discs.sort((a, b) => b.ranking - a.ranking)
+    } else if (query.sale) {
+      discs.sort((a, b) => a.lowestPrice - b.lowestPrice)
+    }
+
+    return discs
   }
 
   async findOne(discId: number, details: boolean = true) {

@@ -32,7 +32,7 @@ export class Order {
   })
   payment_method: PaymentMethod;
 
-  @Column({ default: true }) // mock the payment
+  @Column({ default: true })
   paid: boolean;
 
   @Column({ default: false })

@@ -6,7 +6,6 @@ import { Address } from "./entities/address.entity";
 export class AddressesRepository extends Repository<Address> {
 
   async createAddress(data: Address): Promise<Address> {
-    console.log(data);
     const entity: Address = this.create(data);
 
     try {
