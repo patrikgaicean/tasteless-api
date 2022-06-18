@@ -44,10 +44,10 @@ export class ProductsService {
             `
           })
         } catch (err) {
-          console.error(err); // invalid emails or whatever
+          console.error(err);
         }
 
-        await this.notificationsService.removeForUser(n.notificationId, n.userId);
+        await this.notificationsService.removeForUser(n.notificationId, n.userId); // debugging
       })
     )
 
